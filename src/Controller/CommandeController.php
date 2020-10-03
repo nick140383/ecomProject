@@ -83,7 +83,7 @@ class CommandeController extends AbstractController
             }
 
             $user = $this->getUser();
-            $commande->setMontantLigne($totalNet);
+            $commande->setTotalCommande($totalNet);
             $commande->setDateCommande(new \DateTime());
             $commande->setClient($this->getUser());
             $adress = $user->getAdresse();
@@ -110,8 +110,6 @@ class CommandeController extends AbstractController
             // $livraison = $this->getDoctrine()->getRepository('App\Entity\Livraison')->find($adress);
 
             $commande->setLivraison($livraison);
-            $mode_paiement = $this->getDoctrine()->getRepository('App\Entity\ModePaiement')->find(1);
-            $commande->setModePaiement($mode_paiement);
 
             $em->persist($commande);
             $em->flush();

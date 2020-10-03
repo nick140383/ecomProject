@@ -15,7 +15,7 @@ class RetourneType extends AbstractType
     {
         $builder
             ->add('raison', TextareaType::class, ['label' => 'Pourquoi souhaitez-vous retourner le produit ?', 'attr' => ['rows' => 4, 'name' => 'raison']])
-            ->add('Valider', SubmitType::class, ['label' => 'Valider', 'attr' => ['class' => 'float-right btn btn-primary']])
+            ->add('valider', SubmitType::class, ['label' => 'Valider', 'attr' => ['class' => 'float-right btn btn-primary']])
         ;
     }
 

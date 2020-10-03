@@ -18,7 +18,7 @@
                             <button class="btn btn-link" type="button" data-toggle="collapse"
                                 data-target="#commande{{commande.id}}" aria-expanded="true"
                                 aria-controls="commande{{commande.id}}">
-                                Commande de date : {{ commande.dateCommande | date('Y-m-d') }}
+                                Date de la Commande : {{ commande.dateCommande | date( 'Y-m-d ') }}
                             </button>
                         </h2>
                     </div>
@@ -44,7 +44,7 @@
                                         <td>
                                             <a href="/detail/chaussure/{{ item.modeleChaussure.id }}"
                                                 class="card-link text-white">
-                                                <img class="d-block w-100 rounded"
+                                                <img class="d-block rounded"
                                                     src="/img/{{item.modeleChaussure.coverImage}}" alt="first slide"
                                                     height="60">
                                             </a>
@@ -54,27 +54,28 @@
                                                 class="card-link text-white">{{ item.modeleChaussure.nom }}</a>
                                         </td>
                                         <td>
-                                            {{ item.prix ~ ' €'}}
+                                            <span class="badge badge-pill badge-primary">{{ item.prix ~ '.00 €'}}</span>  
 
                                         </td>
                                         <td>{{ item.taille.taille }}</td>
                                         <td>
                                             {{ item.quantite }}
                                         </td>
-                                        <td>{{ (item.prix * item.quantite)  ~ '.00 €'}}</td>
+                                        <td><span class="badge badge-pill badge-warning"> {{ (item.prix * item.quantite)  ~ '.00 €'}} </span> </td>
                                         <td>
-                                        {% if item.reclame == false %}
+                                        {% if item.message == false %}
                                             <a href="{{ path('retourne_add', {'taille': item.taille.id, 'commande': commande.id}) }}"
                                                 class="btn btn-danger btn-sm">Retourner le produit</a>
                                         {% else %}
                                             {% for produit in retourne_produit %}
-                                                {% if (app.user.id == produit.client.id) and (item.modeleChaussure.id == produit.produit.id) and (item.taille.taille == produit.taille.taille) %}
+                                                {# {% if (app.user.id == produit.client.id) and (item.modeleChaussure.id == produit.produit.id) and (item.taille.taille == produit.taille.taille) %} #}
+                                                {% if produit.commande.id == item.commande.id %}
                                                     {% if  produit.confirme is same as (true) %}
                                                         <span class="badge badge-success">ce produit a été retourné</span>
                                                     {% elseif produit.confirme is same as (false) %}
-                                                        <span class="badge badge-danger">ce produit a été refuse</span>
+                                                        <span class="badge badge-danger">ce produit a été refusé</span>
                                                     {% elseif produit.confirme is same as (null) %}
-                                                    <span class="badge badge-danger">en attends la reponse</span>
+                                                    <span class="badge badge-danger">en attente de reponse</span>
                                                     {% endif %}
                                                 {% endif %}
                                             {% endfor %}

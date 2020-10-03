@@ -1,0 +1,15 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Modification de la Marque!{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Modifier la Marque</h1>
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button type="submit" class="btn btn-primary">Modifier la Marque</button>
+        {{ form_end(form) }}
+
+    </div>
+
+{% endblock %}

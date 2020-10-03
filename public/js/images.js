@@ -2,14 +2,14 @@ window.onload = ()=>{
     //Gestion des boutons "supprimer"
     let links=document.querySelectorAll("[data-delete]")
     // on boucle sur links
-    for(link of links)
-    {
+    // for(link of links)
+    // {
         //on ecoute le clic
-        link.addEventListener("click",function(e){
+        document.querySelector('#cover').addEventListener("click",function(e){
             //on empeche la navigation
             e.preventDefault()
             //on demande confirmation
-            if(confirm("voulez vous supprimer cette image?")){
+            if(confirm("voulez vous supprimer cette cover image?")){
                 //on envoie une requete Ajax vers le href du lien avec la methode DELETE
                 fetch(this.getAttribute("href"),{
                     method:"DELETE",
@@ -29,7 +29,7 @@ window.onload = ()=>{
                 }).catch(e=>alert(e))
             }
         })
-    }
-
+    // }
+    
 }
 

@@ -20,6 +20,10 @@ class RetourneProduit
      */
     private $id;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $quantite_retourne;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Client", inversedBy="retourne")
@@ -146,6 +150,18 @@ class RetourneProduit
     public function setTaille(?Taille $taille): self
     {
         $this->taille = $taille;
+
+        return $this;
+    }
+
+    public function getQuantiteRetourne(): ?int
+    {
+        return $this->quantite_retourne;
+    }
+
+    public function setQuantiteRetourne(int $quantite_retourne): self
+    {
+        $this->quantite_retourne = $quantite_retourne;
 
         return $this;
     }

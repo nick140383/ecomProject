@@ -23,7 +23,7 @@ class Commande
     /**
      * @ORM\Column(type="decimal", precision=10, scale=2)
      */
-    private $montantLigne;
+    private $totalCommande;
 
     /**
      * @ORM\Column(type="date")
@@ -46,12 +46,6 @@ class Commande
      * @ORM\JoinColumn(nullable=false)
      */
     private $livraison;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\ModePaiement", inversedBy="commandes")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $modePaiement;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\ModeleChaussure", mappedBy="commandes")
@@ -93,18 +87,6 @@ class Commande
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getMontantLigne(): ?string
-    {
-        return $this->montantLigne;
-    }
-
-    public function setMontantLigne(string $montantLigne): self
-    {
-        $this->montantLigne = $montantLigne;
-
-        return $this;
     }
 
     public function getDateCommande(): ?\DateTimeInterface
@@ -171,17 +153,6 @@ class Commande
         return $this;
     }
 
-    public function getModePaiement(): ?ModePaiement
-    {
-        return $this->modePaiement;
-    }
-
-    public function setModePaiement(?ModePaiement $modePaiement): self
-    {
-        $this->modePaiement = $modePaiement;
-
-        return $this;
-    }
 
     /**
      * @return Collection|ModeleChaussure[]
@@ -295,6 +266,18 @@ class Commande
                 $retourne->setCommande(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTotalCommande(): ?string
+    {
+        return $this->totalCommande;
+    }
+
+    public function setTotalCommande(string $totalCommande): self
+    {
+        $this->totalCommande = $totalCommande;
 
         return $this;
     }

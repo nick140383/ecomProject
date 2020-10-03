@@ -1,35 +1,20 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base.html.twig' %}
 
-{% block title %}creation d'une nouvelle chaussure!
-{% endblock %}
+{% block title %}creation d'une nouvelle chaussure!{% endblock %}
 
-{% form_theme form _self %}
+
 
 {% block body%}
+
     <div class="container">
         <h1>Créer une nouvelle chaussure</h1>
-
         {{ form_start(form) }}
-        {{ form_row(form.nom, {'label': 'Nom','attr': {'placeholder': 'nom de la chaussure...'}}) }}
-        {{ form_row(form.prix, {'label': 'Prix','attr': {'placeholder': 'prix de la chaussure...'}}) }}
-        {{ form_row(form.description, {'label': 'description', 'attr': {'placeholder': 'ajouter une description...'}}) }}
-        {{ form_row(form.description, {'label': 'upload coverImage', 'attr': {'placeholder': 'importez une image de couverture...'}}) }}
-
-        {{ form_row(form.marque, {'label': 'Sélectionnez la marque', 'attr': {'placeholder' : 'Votre marque...'}})}}
-
-        <div class="form-group">
-            <button type="button" id="add-photo" class="btn btn-primary">Ajouter une image</button>
-
-
-
+        {{ form_widget(form) }}
+        <button type="submit" class="btn btn-primary">Créer  la nouvelle chaussure</button>
         {{ form_end(form) }}
 
-
-    </div>    {#verifier si la route est "modeleChaussures_edit" on affiche les photos #}
-
-    <p>Ici,vous pouvez ajouter vos propres photos!</p>
-
-
+    </div>
 {% endblock %}
+
 
 {% block javascripts %}{% endblock %}

@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\Controller\Services\Helpers;
 use App\Repository\ModeleChaussureRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -14,20 +16,26 @@ class CartController extends AbstractController
 {
 
     /**
-     *@Route("/cart", name="cart_index")
+     * @Route("/cart", name="cart_index")
+     * @param Helpers $helpers
+     * @return Response
      */
     public function index(Helpers $helpers)
     {
         return $this->render('cart/cart.html.twig', [
             'list' => $helpers->getList(), // liste des marques
-            'carts' => $helpers->getProduct(), // produits de panier
             'items' => $helpers->getProduct(), // liste des produits 
             'total' => $helpers->getTotal() // total
         ]);
     }
+
     /**
      * Methode qui permet d'ajouter les produits au panier
-     *@Route("/cart/add/{id}", name="cart_add")
+     * @Route("/cart/add/{id}", name="cart_add")
+     * @param $id
+     * @param Request $request
+     * @param SessionInterface $session
+     * @return RedirectResponse
      */
     public function add($id, Request $request, SessionInterface $session)
     {

@@ -1,0 +1,49 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Administration Commandes{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+    <h1 class="my-5">Gestion des Commandes</h1>
+    <table class="table table-hover">
+    <thread>
+        <tr>
+            <th>Id</th>
+            <th>client</th>
+            <th>date de la commande</th>
+            <th>Montant total</th>
+            <th>Date livraison</th>
+            <th>factures</th>
+            <th>Actions</th>
+
+
+
+            <th></th>
+        </tr>
+    </thread>
+    <tbody>
+
+    {% for commande in commandes %}
+
+        <tr>
+            <td>{{ commande.id }}</td>
+            <td>{{ commande.client.nom }}
+            <td>{{ commande.dateCommande|date('d-m-Y') }}</td>
+            <td>{{ commande.totalCommande }}</td>
+            <td>{{ commande.livraison.dateLivraison|date( ) }}</td>
+             <td>{{ commande.id }}</td>
+
+
+
+
+            <td>
+
+                <a href="{{ path('ville_edit',{'id':commande.id}) }}" class="btn btn-primary"><i
+                            class="fas fa-edit"></i></a>
+                <a href="{{ path('admin_chaussures_delete',{'id':commande.id}) }}" class="btn btn-danger"><i
+                            class="fas fa-trash"></i></a>
+            </td>
+        </tr>
+    {% endfor %}
+
+{% endblock %}

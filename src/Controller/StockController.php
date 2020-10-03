@@ -94,15 +94,16 @@ class StockController extends AbstractController
         return $this->render('stock/new.html.twig', [
             'form' => $form->createView(),
             'list' => $list,
-            'carts' => $helpers->getProduct(),
         ]);
     }
 
 
     /**
      * @Route("/stock/{stock_id}/edit/{chaussure_slug}-{chaussure_id}" ,name="stock_edit",methods={"GET","POST"})
+     * @param $stock_id
      * @param Request $request
-     * @param EntityManagerInterface $manager
+     * @param $chaussure_id
+     * @param Helpers $helpers
      * @return RedirectResponse|Response
      */
     public function edit($stock_id, Request $request, $chaussure_id, Helpers $helpers)
@@ -124,7 +125,6 @@ class StockController extends AbstractController
         return $this->render('stock/edition.html.twig', [
             'form' => $form->createView(),
             'list' => $list,
-            'carts' => $helpers->getProduct(),
             'chaussure' => $chaussure,
             'stock' => $stock
         ]);
@@ -152,9 +152,10 @@ class StockController extends AbstractController
         return $this->render('stock/edition.html.twig', [
             'form' => $form->createView(),
             'list' => $list,
-            'carts' => $helpers->getProduct(),
             'chaussure' => $chaussure,
             'stock' => $stock
         ]);
     }
+
+    
 }

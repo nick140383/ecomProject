@@ -38,7 +38,7 @@ class Commentaire
      * @ORM\ManyToOne(targetEntity="App\Entity\ModeleChaussure", inversedBy="commentaires")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $modele;
+    public $modele;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Commande", inversedBy="commentaires")

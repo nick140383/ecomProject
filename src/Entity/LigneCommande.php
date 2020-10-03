@@ -22,6 +22,12 @@ class LigneCommande
      */
     private $quantite;
 
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $quantite_retourne;
+
     /**
      * @ORM\Column(type="float")
      */
@@ -31,11 +37,6 @@ class LigneCommande
      * @ORM\ManyToOne(targetEntity=ModeleChaussure::class, inversedBy="taille")
      */
     private $modeleChaussure;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $relation;
 
     /**
      * @ORM\ManyToOne(targetEntity=Taille::class, inversedBy="ligneCommandes")
@@ -50,7 +51,7 @@ class LigneCommande
     /**
      * @ORM\Column(type="boolean", nullable=false, options={"default": 0})
      */
-    private $reclame;
+    private $message;
 
     public function getId(): ?int
     {
@@ -93,17 +94,6 @@ class LigneCommande
         return $this;
     }
 
-    public function getRelation(): ?string
-    {
-        return $this->relation;
-    }
-
-    public function setRelation(?string $relation): self
-    {
-        $this->relation = $relation;
-
-        return $this;
-    }
 
     public function getTaille(): ?Taille
     {
@@ -129,14 +119,27 @@ class LigneCommande
         return $this;
     }
 
-    public function getReclame(): ?bool
+
+    public function getQuantiteRetourne(): ?int
     {
-        return $this->reclame;
+        return $this->quantite_retourne;
     }
 
-    public function setReclame(bool $reclame): self
+    public function setQuantiteRetourne(int $quantite_retourne): self
     {
-        $this->reclame = $reclame;
+        $this->quantite_retourne = $quantite_retourne;
+
+        return $this;
+    }
+
+    public function getMessage(): ?bool
+    {
+        return $this->message;
+    }
+
+    public function setMessage(bool $message): self
+    {
+        $this->message = $message;
 
         return $this;
     }

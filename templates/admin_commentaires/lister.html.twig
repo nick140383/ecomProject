@@ -1,0 +1,48 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}liste des commentaires!{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+    <h1 class="my-5">Gestion des commentaires</h1>
+    <table class="table table-hover">
+    <thread>
+        <tr>
+            <th>Id</th>
+            <th>commentaires</th>
+            <th>date du commentaire</th>
+            <th>Auteur du commentaire</th>
+            <th>chaussures</th>
+            <th>Actions</th>
+
+
+
+            <th></th>
+        </tr>
+    </thread>
+    <tbody>
+
+    {% for commentaire in commentaires %}
+
+
+        <tr>
+            <td>{{ commentaire.id }}</td>
+            <td>{{ commentaire.commentaire }}
+            <td>{{ commentaire.dateCommentaire|date('Y-m-d H:i:s' )  }}</td>
+            <td>{{ commentaire.client.nom }}
+            <td>{{ commentaire.modele.nom }}
+
+
+
+
+            <td>
+
+                <a href="{{ path('ville_edit',{'id':commentaire.id}) }}" class="btn btn-primary"><i
+                            class="fas fa-edit"></i></a>
+                <a href="{{ path('admin_chaussures_delete',{'id':commentaire.id}) }}" class="btn btn-danger"><i
+                            class="fas fa-trash"></i></a>
+            </td>
+        </tr>
+    {% endfor %}
+
+{% endblock %}

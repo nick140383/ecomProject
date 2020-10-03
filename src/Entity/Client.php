@@ -69,7 +69,7 @@ class Client implements UserInterface
     private $ville;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Commande", mappedBy="client")
+     * @ORM\OneToMany(targetEntity="App\Entity\Commande", mappedBy="client",cascade={"remove"})
      */
     private $commandes;
 

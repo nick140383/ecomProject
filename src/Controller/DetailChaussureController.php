@@ -20,6 +20,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -34,21 +35,23 @@ class DetailChaussureController extends AbstractController
     private $marqueRepository;
     private $clientRepository;
     private $promotion;
-    function __construct(MarqueRepository $marqueRepository, ClientRepository $clientRepository, PromotionRepository $promotionRepository)
+    private $modeleChaussure;
+    function __construct(MarqueRepository $marqueRepository, ClientRepository $clientRepository, PromotionRepository $promotionRepository, ModeleChaussureRepository $modeleChaussureRepository)
     {
         $this->marqueRepository = $marqueRepository;
         $this->clientRepository = $clientRepository;
         $this->promotion = $promotionRepository;
+        $this->modeleChaussure = $modeleChaussureRepository;
     }
 
     /**
      * @Route("/detail/chaussure/{id}", name="detail_chaussure")
+     * @param Helpers $helpers
      * @param ModeleChaussureRepository $repository
      * @param Request $request
      * @param EntityManagerInterface $manager
      * @param int $id
      * @return Response
-     * @throws \Exception
      */
     public function index(Helpers $helpers, ModeleChaussureRepository $repository, Request $request, EntityManagerInterface $manager, int $id)
     {
@@ -84,15 +87,16 @@ class DetailChaussureController extends AbstractController
         // recupere les promotion
         $promotion = null;
         
-        // si date fin de promotion est plus grand d'aujourd'hui
-        if($this->promotion->findOneBy(['modeleChaussure' => $chaussure])->getDateFin()->format('Y-m-d') > date('Y-m-d')){
-            $promotion = $this->promotion->findOneBy(['modeleChaussure' => $chaussure]);
+        //si date fin de promotion est plus grand d'aujourd'hui
+        if (count((array)$this->promotion->findOneBy(['modeleChaussure' => $chaussure])) > 0) {
+            if ($this->promotion->findOneBy(['modeleChaussure' => $chaussure])->getDateFin()->format('Y-m-d') >= date('Y-m-d')) {
+                $promotion = $this->promotion->findOneBy(['modeleChaussure' => $chaussure]);
+            }
         }
 
         return $this->render('detail_chaussure/index.html.twig', [
             'chaussure' => $chaussure,
             'list' => $list,
-            'carts' => $helpers->getProduct(), // produits de panier
             'commentForm' => $form->createView(), 
             'taille' => $taille,
             'stocksArr' => $stocksArr,
@@ -103,11 +107,13 @@ class DetailChaussureController extends AbstractController
 
     /**
      * @Route("/chaussure/new", name="chaussure_nouveau",methods={"GET","POST"})
+     * @Security("is_granted('ROLE_ADMIN')")
      * @param Request $request
      * @param EntityManagerInterface $manager
-     * @return Respons
+     * @param Helpers $helpers
+     * @return RedirectResponse|Response
      */
-    public function create(Request $request, EntityManagerInterface $manager)
+    public function create(Request $request, EntityManagerInterface $manager,Helpers $helpers)
     {
         $chaussure = new ModeleChaussure();
         $manager = $this->getDoctrine()->getManager();
@@ -170,39 +176,52 @@ class DetailChaussureController extends AbstractController
                 'success',
                 "Bravo <strong class='text-danger'>{$chaussure->getNom()}</strong> Insertion reussie"
             );
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('admin_modele_chaussure');
         }
         $list = $this->marqueRepository->findAll();
 
         return $this->render('detail_chaussure/nouvelle_chaussure.html.twig', [
             'form' => $form->createView(),
-            'list' => $list
+            'list' => $list,
         ]);
     }
 
 
     /**
      * @Route("/detail/chaussure/{id}/edit" ,name="modeleChaussures_edit",methods={"GET","POST"})
+     * @Security("is_granted('ROLE_ADMIN')")
      * @param ModeleChaussure $chaussure
      * @param Request $request
      * @param EntityManagerInterface $manager
      * @return Response
      */
-    public function edit(Request $request, ModeleChaussure $chaussure, EntityManagerInterface $manager)
+    public function edit(Request $request, ModeleChaussure $chaussure, EntityManagerInterface $manager, Helpers $helpers)
     {
         $form = $this->createForm(ModeleChaussureType::class, $chaussure);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            
             $this->getDoctrine()->getManager()->flush();
             //on recupere les photos transmises
             $photos = $form->get('photos')->getData();
             //on boucle sur les photos
-
+            
             //   $photos =$chaussure->getPhotos();
+            
+            $cover_image = $form->getData()->getCoverImage();
+
+            if ($cover_image) {
+                $filename = md5(uniqid()) . '.' . $cover_image->guessClientExtension();
+                try {
+                    $cover_image->move($this->getParameter('coverImage_directory'), $filename);
+                    $chaussure->setCoverImage($filename);
+                } catch (\Throwable $th) {
+                    $this->addFlash('danger', $th);
+                }
+            }
 
             foreach ($photos as $photo) {
-
                 //on genere un nouveau nom de fichier
                 $fileName = md5(uniqid()) . '.' . $photo->guessExtension();
                 //on copie le fichier dans le dossier coverImage
@@ -233,7 +252,7 @@ class DetailChaussureController extends AbstractController
                 'success',
                 "Bravo <strong class='text-danger'>{$chaussure->getNom()}</strong> Modification reussie"
             );
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('admin_modele_chaussure');
         }
         $list = $this->marqueRepository->findAll();
 
@@ -246,8 +265,8 @@ class DetailChaussureController extends AbstractController
 
 
     /**
-     * @param Photo $photo
-     *   @Security("is_granted('ROLE_ADMIN')")
+     * @param Photo $photo 
+     * @Security("is_granted('ROLE_ADMIN')")
      * @param Request $request
      * @return JsonResponse
      * @Route("detail/chaussure/supprime/photo/{id}",name="chaussures_photo_supprime",methods={"DELETE"})
@@ -271,7 +290,25 @@ class DetailChaussureController extends AbstractController
             return new JsonResponse(['error' => 'Token Invalide'], 400);
         }
     }
-
+    
+     /**
+     * METHODE PERMET DE SUPPRIMER IMAGE COVER
+     * @Route("/admin/cover-image/{id}/delete", name="admin_delete_image_cover")
+     *
+     * @param [type] $id
+     * @param Request $request
+     * @param EntityManagerInterface $em
+     * @return void
+     */
+    public function adminDeleteImageCoverByAxios($id,Request $request,  EntityManagerInterface $em)
+    {
+        $modeleChaussure = $this->modeleChaussure->findOneBy(['id' => $id]);
+        $modeleChaussure->setCoverImage("null");
+        $em->persist($modeleChaussure);
+        $em->flush();
+        return new Response();
+        
+    }
 
 
     private function generateUniqueFileName()

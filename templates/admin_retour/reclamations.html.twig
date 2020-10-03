@@ -1,0 +1,164 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{parent()}} | Gestion des Commandes Retournées{% endblock %}
+{% block stylesheets %}
+<script src="https://kit.fontawesome.com/e003ccf534.js" crossorigin="anonymous"></script>
+{% endblock %}
+{% block body %}
+<div class=" container container-fluid">
+    <h1 class="mb-3 text-center">Gestion des Commandes Retournées</h1>
+    <hr>
+    <table class="table table-hover border border-secondary">
+        <thead class="bg-light text-white">
+            <tr>
+                <th>Id</th>
+                <th>Client</th>
+                <th>Produit</th>
+                <th>Taille</th>
+                <th>quantite</th>
+                <th>Date Retournée</th>
+                <th>Raison</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for commande in commandes %}
+            <tr>
+                <td>{{ commande.id }}</td>
+                <td>{{ commande.client.nom }} {{ commande.client.prenom }}</td>
+                <td>{{ commande.produit.nom }}</td>
+                <td>{{ commande.taille.taille }}</td>
+                <td>{{ commande.quantiteRetourne }}</td>
+                <td>{{ commande.dateRetourne | date('Y-m-d')}} </td>
+                <td>{{ commande.raison |slice(0, 20)  }}</td>
+                <td>
+                    {% if commande.confirme == "0" %}
+                    <span class="badge badge-danger">Refusé</span>
+                    {% elseif commande.confirme == "1" %}
+                    <span class="badge badge-success">Accepté</span>
+                    {% elseif commande.confirme == "" %}
+                    <span class="badge badge-warning">en attends la reponse</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <button type="button" data-toggle="modal" data-target="#view{{commande.id}}"
+                        class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
+                    <button type="button" data-toggle="modal" data-target="#delete{{commande.id}}"
+                        class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+
+                </td>
+            </tr>
+
+            <!-- View Modal -->
+            <div class="modal fade" id="view{{commande.id}}" data-backdrop="static" data-keyboard="false" tabindex="-1"
+                aria-labelledby="view{{commande.id}}Label" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-info">
+                            <h5 class="modal-title lead text-uppercase" id="staticBackdropLabel">{{ commande.client.nom }} 
+                            </h5>
+                             <small class="text-dark d-block mt-1 ml-2">{{commande.dateRetourne | date('Y-m-d')}}</small>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body p-3 row no-gutters">
+                                <div class="col-md-4 p-2">
+                                    <a href="/detail/chaussure/{{ commande.produit.id }}"
+                                        class="card-link text-white card-img-top">
+                                        <img class="d-block w-100 rounded" src="/img/{{commande.produit.coverImage}}"
+                                            alt="first slide" height="260">
+                                    </a>
+                                </div>
+                                <div class="col-md-8 p-2">
+                                    <h5 class="card-title text-uppercase">{{commande.produit.nom}}</h5>
+                                     
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="card-title">Taille : {{ commande.taille.taille }}</h6>
+                                        <h6 class="card-title">Quantite :
+                                          {% for ligneCommande in ligneCommandes if ligneCommande.commande.id == commande.commande.id %}
+                                            {{ ligneCommande.quantite }}
+                                            {% endfor %} | à
+                                            retourne : 
+                                           {{ commande.quantiteRetourne }} 
+                                            </h6>
+                                        <h6 class="card-title">
+                                            Prix : <span class="badge badge-pill badge-primary">
+                                            {% for ligneCommande in ligneCommandes if ligneCommande.commande.id == commande.commande.id %}
+                                                {{ ligneCommande.prix ~ '.00 €'}}
+                                            {% endfor %}
+                                                
+                                                </span>
+                                        </h6>
+                                    </div>
+                                    <hr>
+                                    <span class="card-text">Raison : </span>
+                                    <small class="card-text">{{commande.raison}}</small>
+                                </div>
+                            
+                            {# <a href="{{ path('refuser_reclamation', {'id':commande.id}) }}"
+                                class="btn btn-danger float-right">Refuser</a>
+                            <a href="{{ path('accepter_reclamation', {'id':commande.id}) }}"
+                                class="btn btn-success float-right mx-1">Accepter</a> #}
+                        </div>
+                        <div class="modal-footer border-light">
+                           
+                            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Fermer</button>
+                             {% if commande.confirme == "0"  or commande.confirme == "1" %}
+                             {% elseif commande.confirme == "" %}
+                                <form action="{{ path('refuser_reclamation', {'id':commande.id}) }}"
+                                    method="POST">
+                                    <button type="submit" class="btn btn-danger btn-sm">Refuser</button>
+                                </form>
+                                <form action="{{ path('accepter_reclamation', {'id':commande.id}) }}"
+                                    method="POST">
+                                    <button type="submit" class="btn btn-success btn-sm">Accepter</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End View Modal -->
+
+            <!-- Supprimer Modal -->
+            <div class="modal fade" id="delete{{commande.id}}" data-backdrop="static" data-keyboard="false"
+                tabindex="-1" aria-labelledby="delete{{commande.id}}Label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger">
+                            <h5 class="modal-title lead text-uppercase" id="staticBackdropLabel">Supprimer la
+                                Reclamation </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body py-3">
+                            <h2 class="lead">Voulez vous vraiment supprimer cette Réclamation ?</h2>
+                        </div>
+                        <div class="modal-footer border-light">
+                            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Non</button>
+                            <form action="{{ path('admin_delete_commandeRetournee', {'id': commande.id}) }}"
+                                method="POST">
+                                <button type="submit" class="btn btn-danger btn-sm">Oui</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Supprimer Modal -->
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block javascripts %}
+<script>
+    $(document).ready(function () {
+        if ($('.form-error-message').text() != "") {
+            $('#add').modal('show');
+        }
+    });
+</script>
+{% endblock %}

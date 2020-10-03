@@ -18,13 +18,65 @@
             <div class="col-md-8">
                 <div class="d-flex justify-content-between">
                     <h3>Taille : {{ produit.taille.taille }}</h3>
-                    <h3>Quantite : {{ produit.quantite }}</h3>
+                    <h3 id="qte_input" data-qte="{{ produit.quantite }}">Quantite : {{ produit.quantite }}</h3>
                     <h3>Prix : {{ produit.prix  ~ '€'}}</h3>
                 </div>
-                {{form(form)}}
+                {{form_start(form)}}
+                <div class="form-group row">
+                    <div class="col-8">
+                    {{form_row(form.raison)}}
+                    </div>
+                    <div class="col-4">
+                        <!-- qte -->
+                        <label for=""> Quantite :</label>
+                        <div class="d-block d-flex justify-content-around w-50">
+                            <button type="button" class="btn btn-sm btn-dark" id="moins">-</button>
+                            <span id="available_qty" class="badge badge-warning d-block py-2"
+                                style="font-size: 17px;">0</span>
+                            <button type="button" class="btn btn-sm btn-dark" id="plus">+</button>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="qte" id="qte" value="">
+                {{form_row(form.valider)}}
+                {{form_end(form)}}
             </div>
             <hr>
         <!-- </div> -->
     </div>
 </div>
+{% endblock %}
+{% block javascripts %}
+{{ parent() }}
+<script type="text/javascript">
+    $(document).ready(function () {
+        // QTE MOINS
+        $('#moins').click(function () {
+            var qte = parseInt($("#available_qty").html());
+            if ((qte - 1) < 0) {
+                $("#available_qty").html(0);
+                $("#qte").val(0);
+            } else {
+                $("#available_qty").html(qte - 1);
+                $("#qte").val(qte - 1);
+            }
+
+        });
+
+        // QTE PLUS
+        $('#plus').click(function () {
+            var qte = parseInt($("#available_qty").html());
+            var qte_stable = $('#qte_input').attr('data-qte');
+            if((qte + 1) <= $('#qte_input').attr('data-qte')){
+                if ((qte + 1) > qte_stable) {
+                    $("#available_qty").html(qte_stable);
+                    $("#qte").val(qte_stable);
+                } else {
+                    $("#available_qty").html(qte + 1);
+                    $("#qte").val(qte + 1);
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

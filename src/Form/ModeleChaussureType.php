@@ -23,18 +23,26 @@ class ModeleChaussureType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nom', TextType::class)
-            ->add('prix',MoneyType::class)
-            ->add('description', TextareaType::class)
+            ->add('nom', TextType::class,array('label'=>'nom',
+            'attr'=>array('placeholder'=>'entrez le nom de la chaussure')))
+      
+            ->add('prix',MoneyType::class,array('label'=>'prix',
+            'attr'=>array('placeholder'=>'entrez le prix de la chaussure')))
+            ->add('description', TextareaType::class,array('label'=>'description',
+            'attr'=>array('placeholder'=>'faites une brêve description de la chaussure ')))
          ->add('coverImage',FileType::class,array(
-             'label'=>'upload coverImage',
-           //      'mapped'=>false,
+             'label'=>'Importez une image de couverture',
+             'data_class'=>null,
+'attr'=>array('placeholder'=>'importez une image de couverture',
+             
+          
                  'data_class'=>null
+                 
 
-             )
+             )))
 
 
-         )
+         
 
             ->setMethod("POST")
 
@@ -48,35 +56,23 @@ class ModeleChaussureType extends AbstractType
           ->add(
                'photos',
 
-               FileType::class,[
-                  'label'=>'upload others pictures',
+               FileType::class,array(
+                  'label'=>'importez autres images',
+                  'data_class'=>null,
+                  'mapped' => false,
+                    
+       
+       'attr'=>array('placeholder'=>'importez une ou plusieurs   images de couverture',
 
               'by_reference' => true,
                   'multiple' => true,
                    'data_class'=>null,
                    'mapped'=>false,
-                 'required'=>false,]
+                 'required'=>false,))
 
        )
-
-      //*  ->add('photos', CollectionType::class, [
-          //   'entry_type' => PhotoType::class,
-         //   'allow_add' => true,
-         //   'allow_delete' => true,
-       //     'prototype' => true,
-        //   'by_reference' => false,
-       //      'label' => false,
-      //      'mapped'=>false,
-     //    ])
-
-
-      ->add('Ajouter une nouvelle chaussure',SubmitType::class,[
-                'attr'=>[
-                   'class'=>'btn btn-success'
-                ]
-           ])
-
-     ;
+            ;
+     
     }
 
     public function configureOptions(OptionsResolver $resolver)

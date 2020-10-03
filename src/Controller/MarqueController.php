@@ -33,7 +33,6 @@ class MarqueController extends AbstractController
         $list = $this->marqueRepository->findAll();
         return $this->render('marque/index.html.twig', [
             'list' => $list, // liste des marques
-            'carts' => $helpers->getProduct(), // produits de panier
         ]);
     }
 
@@ -51,7 +50,6 @@ class MarqueController extends AbstractController
 
         return $this->render('marque/chaussures.html.twig', [
             'list' => $list, // liste des marques
-            'carts' => $helpers->getProduct(), // produits de panier
             'chaussures' => $chaussures // produits
         ]);
     }

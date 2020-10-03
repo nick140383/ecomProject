@@ -24,7 +24,7 @@
                             <div class="d-flex justify-content-between">
                                 <h6 class="card-title">Taille : {{ produit.taille.taille }}</h6>
                                 <h6 class="card-title">Quantite : {{ produit.quantite }}</h6>
-                                <h6 class="card-title">Prix : {{ produit.prix  ~ '€'}}</h6>
+                                <h6 class="card-title">Prix : {{ produit.modeleChaussure.prix  ~ '€'}}</h6>
                             </div>
                             <hr>
                             <span class="card-text">Raison : </span>
@@ -34,7 +34,7 @@
                 </div>
                 <div class="card-footer">
                     <p class="card-text float-left">{{ retourne_info.client.nom }}
-                    <small class="text-muted d-block">{{retourne_info.dateRetourne | date('Y-m-d à h\\hi')}}</small> </p>
+                    <small class="text-muted d-block">{{retourne_info.dateRetourne | date( 'Y-m-d H:i:s' )}}</small> </p>
                     <a href="{{ path('refuser_reclamation', {'id':retourne_info.id}) }}"
                         class="btn btn-danger float-right">Refuser</a>
                     <a href="{{ path('accepter_reclamation', {'id':retourne_info.id}) }}"

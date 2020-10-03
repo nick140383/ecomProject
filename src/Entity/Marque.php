@@ -28,12 +28,6 @@ class Marque
      */
     private $modeleChaussures;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Fournisseur", inversedBy="marques")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $fournisseur;
-
     public function __construct()
     {
         $this->modeleChaussures = new ArrayCollection();
@@ -83,18 +77,6 @@ class Marque
                 $modeleChaussure->setMarque(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getFournisseur(): ?Fournisseur
-    {
-        return $this->fournisseur;
-    }
-
-    public function setFournisseur(?Fournisseur $fournisseur): self
-    {
-        $this->fournisseur = $fournisseur;
 
         return $this;
     }

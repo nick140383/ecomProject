@@ -12,29 +12,79 @@
                 <th>nom</th>
                 <th>prix</th>
                 <th>description</th>
+                <th>stock</th>
                 <th>Notes</th>
-                <th>orders</th>
+                <th>commandes</th>
                 <th>Actions</th>
+                <th>     <a href=" {{ path('chaussure_nouveau') }}">ajouter nouvelle chaussure</a></th>
 
                 <th></th>
             </tr>
         </thread>
         <tbody>
-        {% for modeleChaussure in modeleChaussures %}
+            {% for modeleChaussure in modeleChaussures %}
             <tr>
                 <td>{{  modeleChaussure.id }}</td>
                 <td>{{  modeleChaussure.nom }}</td>
                 <td>{{  modeleChaussure.prix }}</td>
                 <td>{{  modeleChaussure.description }}</td>
+                <td>{{  modeleChaussure.description }}</td>
                 <td>{{  modeleChaussure.commandes|length}}</td>
                 <td>{{  modeleChaussure.avgRatings }}</td>
 
                 <td>
-                    <a href="{{ path('modeleChaussures_edit',{'id':modeleChaussure.id}) }}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
-                    <a href="{{ path('admin_chaussures_delete',{'id':modeleChaussure.id}) }}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+                    <a href="" data-toggle="modal" data-target="#sheos{{modeleChaussure.id}}" class="btn btn-info"><i
+                            class="fas fa-good"></i>stock</a>
+                    <a href="{{ path('modeleChaussures_edit',{'id':modeleChaussure.id}) }}" class="btn btn-primary"><i
+                            class="fas fa-edit"></i></a>
+                    <a href="{{ path('admin_chaussures_delete',{'id':modeleChaussure.id}) }}" class="btn btn-danger"><i
+                            class="fas fa-trash"></i></a>
                 </td>
             </tr>
-        {% endfor %}
+
+            <!-- Modal -->
+            <div class="modal fade"  id="sheos{{modeleChaussure.id}}" data-backdrop="static" data-keyboard="false"
+                tabindex="-1" aria-labelledby="sheos{{modeleChaussure.id}}Label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">{{  modeleChaussure.nom }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Taille
+                                    <span >Stock</span>  <span >actions</span>
+
+
+                                </li>
+
+
+                                {% for stock in stocks %}
+                                {% if stock.modeleChaussure.id == modeleChaussure.id %}
+                                    <li class="list-group-item-action d-flex justify-content-between align-items-center">
+                                        {{ stock.taille.taille }}
+                                        <span class="badge badge-warning badge-pill">{{ stock.quantite }}</span>  <span><a href="{{path('stock_editFromHeader',{'id':stock.id})}}" class="btn btn-primary">Modifier</a> </span>
+                                    </li>
+
+                                {% endif %}
+
+
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            <a href="{{path('stock_add')}}" class="btn btn-primary">ajouter stock</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </tbody>
     </table>
 </div>

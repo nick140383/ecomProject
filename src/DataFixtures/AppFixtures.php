@@ -33,15 +33,14 @@ class AppFixtures extends Fixture
         $manager->persist($ville);
 
         $adminClient=new Client();
-        $adminClient->setNom('Tounegang');
-        $adminClient->setPrenom('Yannick');
+        $adminClient->setNom('Administrateur');
+        $adminClient->setPrenom('Administrateur');
         $adminClient->setSexe('H');
         $adminClient->setAdresse('rue de chambery 76');
-        $adminClient->setEmail('yannicktchapda@yahoo.fr');
+        $adminClient->setEmail('patcool140383@gmail.com');
         $adminClient->setMotDePasse($this->encoder->encodePassword($adminClient, 'password'));
         $adminClient->setVille($ville);
         $adminClient->addUserRole($adminRole);
-        // $product = new Product();
          $manager->persist($adminClient);
 
         $manager->flush();

@@ -74,10 +74,22 @@
                     </div>
                     <div class="col-md-4">
                         <!-- qte -->
-                        <label for=""> Quantite :</label>
+                        <label for=""> Quantite disponible:</label>
+                        <div class="d-block d-flex justify-content-around w-50">
+
+                            <span id="available_qty" class="badge badge-warning d-block py-2"
+                                  style="font-size: 17px;">0</span>
+
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="col-md-4">
+                        <!-- qte -->
+                        <label for="">choisir  Quantite :</label>
                         <div class="d-block d-flex justify-content-around w-50">
                             <button class="btn btn-sm btn-dark" id="moins">-</button>
-                            <span id="available_qty" class="badge badge-warning d-block py-2"
+                            <span id="choisir_qty" class="badge badge-warning d-block py-2"
                                 style="font-size: 17px;">0</span>
                             <button class="btn btn-sm btn-dark" id="plus">+</button>
                         </div>
@@ -193,7 +205,7 @@
         $("#qte").val($('#taille').find('option:selected').attr('data-qty'));
 
         // QTE MOINS
-        $('#moins').click(function () {
+        $('#plus').click(function () {
             var qte = parseInt($("#available_qty").html());
             if ((qte - 1) < 0) {
                 $("#available_qty").html(0);
@@ -206,7 +218,7 @@
         });
 
         // QTE PLUS
-        $('#plus').click(function () {
+        $('#moins').click(function () {
             var qte = parseInt($("#available_qty").html());
             var qte_stable = $('#taille').find('option:selected').attr('data-qty');
             if ((qte + 1) > qte_stable) {
@@ -218,5 +230,44 @@
             }
         });
     });
+    $(document).ready(function () {
+        var carturl = "{{ path('panier_add',{'id':chaussure.id}) }}";
+        $("#taille").change(function () {
+            $("#cart_url").attr('href', (carturl + '?taille=' + $(this).val()));
+            $("#available_qty").html($(this).find('option:selected').attr('data-qty'));
+            $("#qte").val($(this).find('option:selected').attr('data-qty'));
+            $("#_taille").val($(this).find('option:selected').text());
+        });
+        // on the load page
+        $("#available_qty").html($('#taille').find('option:selected').attr('data-qty'));
+        $("#qte").val($('#taille').find('option:selected').attr('data-qty'));
+
+        // QTE MOINS
+        $('#moins').click(function () {
+            var qte = parseInt($("#choisir_qty").html());
+            if ((qte - 1) < 0) {
+                $("#choisir_qty").html(0);
+                $("#qte").val(0);
+            } else {
+                $("#choisir_qty").html(qte - 1);
+                $("#qte").val(qte - 1);
+            }
+
+        });
+
+        // QTE PLUS
+        $('#plus').click(function () {
+            var qte = parseInt($("#choisir_qty").html());
+            var qte_stable = $('#taille').find('option:selected').attr('data-qty');
+            if ((qte + 1) > qte_stable) {
+                $("#choisir_qty").html(qte_stable);
+                $("#qte").val(qte_stable);
+            } else {
+                $("#choisir_qty").html(qte + 1);
+                $("#qte").val(qte + 1);
+            }
+        });
+    });
 </script>
+
 {% endblock %}

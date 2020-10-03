@@ -9,8 +9,10 @@ use App\Entity\ModeleChaussure;
 use App\Entity\RetourneProduit;
 use App\Form\RetourneType;
 use App\Repository\CommandeRepository;
+use App\Repository\PromotionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
@@ -30,20 +32,25 @@ class RetourneProduitController extends AbstractController
         $form = $this->createForm(RetourneType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
+            // dd($request->request);
             // ajouter le produit retourné a la table
             $retourne = new RetourneProduit();
+            $retourne->setQuantiteRetourne($request->request->get('qte'));
             $retourne->setClient($security->getUser());
             $retourne->setCommande($commande);
             $retourne->setProduit($ligne_commande->getModeleChaussure());
             $retourne->setTaille($ligne_commande->getTaille());
             $retourne->setRaison($request->request->get('retourne')['raison']);
-            $retourne->setDateRetourne(new \DateTime(date('Y-m-d')));
+            $retourne->setDateRetourne(new \DateTime(date( 'Y-m-d H:i:s')));
             $entityManager->persist($retourne);
+
+            // remplir quantiteRetounre
+            $ligne_commande->setQuantiteRetourne($request->request->get('qte'));
+
 
             // definir que ligne commande est reclamée 
             // par default il prends la valeur 0 : n'est pa reclamée
-            $ligne_commande->setReclame(1); // 1 c'est a dire reclame
+            $ligne_commande->setMessage(1); // 1 c'est a dire reclame
             $entityManager->persist($retourne);
             $entityManager->flush();
 
@@ -54,7 +61,6 @@ class RetourneProduitController extends AbstractController
             'produit' => $ligne_commande,
             'form' => $form->createView(),
             'list' => $helpers->getList(),
-            'carts' => $helpers->getProduct(),
         ]);
     }
 
@@ -68,7 +74,8 @@ class RetourneProduitController extends AbstractController
         $reclamations = $this->getDoctrine()->getRepository(RetourneProduit::class)->findBy(['confirme' => null], ['id' => 'desc']);
         return $this->render('admin/reclamations/index.html.twig', [
             'items' => $reclamations,
-            'list'  => $helpers->getList() // list des marques
+            'list'  => $helpers->getList() ,// list des marques
+            
         ]);
     }
 
@@ -76,10 +83,10 @@ class RetourneProduitController extends AbstractController
      * Methode Show Reclamation
      * @Route("/reclamations/{commande}/{taille}/{id}", name="show_reclamation")
      */
-    public function showReclamation($commande, $taille, $id, Helpers $helpers)
+    public function showReclamation($commande, $taille, $id, Helpers $helpers, PromotionRepository $promotionRepository)
     {
         // recupre commande
-        $commande = $this->getDoctrine()->getRepository(LigneCommande::class)->findOneBy(['id' => $commande]);
+        $commande = $this->getDoctrine()->getRepository(Commande::class)->findOneBy(['id' => $commande]);
         // recupre lignecommande par commande et taille et le champ reclame doit etre true (reclamé)
         $ligne_commande = $this->getDoctrine()->getRepository(LigneCommande::class)->findOneBy(['commande' => $commande, 'taille' => $taille, 'reclame' => true]);
         // recupre lignecommande par id (paramatere au dessus)
@@ -88,7 +95,9 @@ class RetourneProduitController extends AbstractController
         return $this->render('admin/reclamations/show.html.twig', [
             'produit' => $ligne_commande, // info de produit
             'retourne_info' => $retourn_info, // info de reclamation (raison et la date)
-            'list'  => $helpers->getList() // list des marques
+            'list'  => $helpers->getList(), // list des marques
+            'promotions' => $promotionRepository->findAll(),
+           
         ]);
     }
 
@@ -96,7 +105,7 @@ class RetourneProduitController extends AbstractController
      * Methode Accepter reclamation de cote ADMIN
      * @Route("/reclamations/{id}/accepter", name="accepter_reclamation")
      */
-    public function accepterReclamation($id, EntityManagerInterface $entityManager, \Swift_Mailer $mailer, Security $security)
+    public function accepterReclamation($id, EntityManagerInterface $entityManager, \Swift_Mailer $mailer, Security $security, Request $request)
     {
         // recupere le produit reclamé
         $retourn_info = $this->getDoctrine()->getRepository(RetourneProduit::class)->findOneBy(['id' => $id]);
@@ -110,18 +119,18 @@ class RetourneProduitController extends AbstractController
         $message = (new \Swift_Message('l\'administrateur a accepté votre réclamation')) // titre de message
             ->setFrom($security->getUser()->getEmail())  // email de admin ** IMPORTANT ** aller à .env pour plus informations.
             ->setTo($retourn_info->getClient()->getEmail()) // email de le client
-            ->setBody('Félicitations, votre réclamation a été approuvée et le produit vous sera retourné avec le remboursement.');  // le message
+            ->setBody('Félicitations, votre réclamation a été approuvée et la (les) chaussure(s) vous sera (seront) retourné(es) avec le remboursement.');  // le message
         $mailer->send($message); // envoye le message
 
         $this->addFlash('success', 'Le message d\'accepte a été envoyé au client ' . $retourn_info->getClient()->getNom() . ' avec succès.');
-        return $this->redirectToRoute('reclamations');
+        return new RedirectResponse($request->headers->get('referer'));
     }
 
     /**
      * Methode Refuser reclamation de cote ADMIN
      * @Route("/reclamations/{id}/refuser", name="refuser_reclamation")
      */
-    public function refuserReclamation($id, EntityManagerInterface $entityManager, \Swift_Mailer $mailer, Security $security)
+    public function refuserReclamation($id, EntityManagerInterface $entityManager, \Swift_Mailer $mailer, Security $security, Request $request)
     {
         // recupere le produit reclamé
         $retourn_info = $this->getDoctrine()->getRepository(RetourneProduit::class)->findOneBy(['id' => $id]);
@@ -132,13 +141,13 @@ class RetourneProduitController extends AbstractController
         $entityManager->flush();
 
         /* pour envoye un message par email (just gmail) */
-        $message = (new \Swift_Message('l\'administrateur a refusée votre réclamation')) // titre de message
+        $message = (new \Swift_Message('l\'administrateur a refusé votre réclamation')) // titre de message
             ->setFrom($security->getUser()->getEmail()) // email de admin ** IMPORTANT ** aller à .env pour plus informations.
             ->setTo($retourn_info->getClient()->getEmail()) // email de le client
             ->setBody('Malheureusement, votre réclamation a été refusée .'); // le message
         $mailer->send($message); // envoye le message
         
-        $this->addFlash('success', 'Le message de refuse a été envoyé au client ' . $retourn_info->getClient()->getNom() . ' avec succès ');
-        return $this->redirectToRoute('reclamations');
+        $this->addFlash('success', 'Le message de refus a été envoyé au client ' . $retourn_info->getClient()->getNom() . ' avec succès ');
+        return new RedirectResponse($request->headers->get('referer'));
     }
 }

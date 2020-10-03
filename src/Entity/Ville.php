@@ -38,11 +38,6 @@ class Ville
      */
     private $livraisons;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Fournisseur", mappedBy="ville")
-     */
-    private $fournisseurs;
-
     public function __construct()
     {
         $this->clients = new ArrayCollection();
@@ -140,35 +135,5 @@ class Ville
 
         return $this;
     }
-
-    /**
-     * @return Collection|Fournisseur[]
-     */
-    public function getFournisseurs(): Collection
-    {
-        return $this->fournisseurs;
-    }
-
-    public function addFournisseur(Fournisseur $fournisseur): self
-    {
-        if (!$this->fournisseurs->contains($fournisseur)) {
-            $this->fournisseurs[] = $fournisseur;
-            $fournisseur->setVille($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFournisseur(Fournisseur $fournisseur): self
-    {
-        if ($this->fournisseurs->contains($fournisseur)) {
-            $this->fournisseurs->removeElement($fournisseur);
-            // set the owning side to null (unless already changed)
-            if ($fournisseur->getVille() === $this) {
-                $fournisseur->setVille(null);
-            }
-        }
-
-        return $this;
-    }
+    
 }

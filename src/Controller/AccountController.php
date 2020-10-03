@@ -13,6 +13,7 @@ use App\Form\PasswordUpdateType;
 use App\Form\RegistrationType;
 use App\Repository\ClientRepository;
 use App\Repository\MarqueRepository;
+use App\Repository\PromotionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Form\FormError;
@@ -31,10 +32,12 @@ class AccountController extends AbstractController
      */
     private $marqueRepository;
     private $clientRepository;
-    function __construct(MarqueRepository $marqueRepository, ClientRepository $clientRepository)
+    private $promotion;
+    function __construct(MarqueRepository $marqueRepository, ClientRepository $clientRepository, PromotionRepository $promotion) 
     {
         $this->marqueRepository = $marqueRepository;
         $this->clientRepository = $clientRepository;
+        $this->promotion = $promotion;
     }
 
     /**
@@ -165,15 +168,17 @@ class AccountController extends AbstractController
     }
 
 
-
     /**
      * Récupère la liste de commandes de chaque client identifié
      * @Route("/myList", name="commande_produit")
+     * @param Helpers $helpers
+     * @param Security $security
+     * @return Response
      */
     public function index(Helpers $helpers, Security $security)
     {
         // Recupere les commande identifié
-        $commandes = $this->getDoctrine()->getRepository(Commande::class)->findBy(['client' => $security->getUser()]);
+        $commandes = $this->getDoctrine()->getRepository(Commande::class)->findBy(['client' => $security->getUser()], ['id' => 'desc']);
         // Recupere les ligne commande identifié (par commande)
         $ligne_commande = $this->getDoctrine()->getRepository(LigneCommande::class)->findBy(['commande' => $commandes]);
         // Recupere les produits retournés identifié (par commande)
@@ -181,24 +186,24 @@ class AccountController extends AbstractController
         
         return $this->render('commande_produit/index.html.twig', [
             'list' => $helpers->getList(), // list des marques
-            'carts' => $helpers->getProduct(), // produits de panier
             'items' => $ligne_commande, 
             'commandes' => $commandes,
-            'retourne_produit' => $retourne_produit
+            'retourne_produit' => $retourne_produit,
+            'promotions' => $this->promotion->findAll()
         ]);
     }
-
 
 
     /**
      * la page de remerciment si le payment est reussie
      * @Route("/payment-accepter", name="thankyou")
+     * @param Helpers $helpers
+     * @return Response
      */
     public function thankYou(Helpers $helpers)
     {
         return $this->render('commande_produit/merci.html.twig', [
             'list' => $helpers->getList(), // list des marques
-            'carts' => $helpers->getProduct(), // produits de panier
         ]);
     }
     

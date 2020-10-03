@@ -17,7 +17,7 @@
                         <th>Client</th>
                         <th>Produit</th>
                         <th>Nom de Produit</th>
-                        <th>Prix</th>
+                        {# <th>Prix</th> #}
                         <th>Date de Retourne</th>
                         <th>Actions</th>
                     </tr>
@@ -38,12 +38,12 @@
                             <a href="/detail/chaussure/{{ item.produit.id }}"
                                 class="card-link text-white">{{ item.produit.nom }}</a>
                         </td>
-                        <td>
+                        {# <td>
                             {{ item.produit.prix ~ ' €'}}
 
-                        </td>
+                        </td> #}
                         <td>
-                            {{ item.dateRetourne | date('Y-m-d') }}
+                            {{ item.dateRetourne | date( 'Y-m-d') }}
                         </td>
                         <td>
                             <a href="{{ path('show_reclamation', {'commande':item.commande.id, 'taille':item.taille.id, 'id':item.id}) }}" type="button" class="btn btn-warning btn-sm">voir</a>

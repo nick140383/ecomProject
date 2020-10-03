@@ -1,0 +1,53 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}liste des promos!{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1 class="my-5">Gestion des promotions</h1>
+        <table class="table table-hover">
+            <thread>
+                <tr>
+                    <th>Id</th>
+                    <th>nom</th>
+                    <th>date de debut</th>
+                    <th>date de fin</th>
+                    <th>Pourcentage</th>
+                    <th>Actions</th>
+                    <th><a href=" {{ path('promotion_add') }}">ajouter nouvelle promotion</a></th>
+
+                    <th></th>
+                </tr>
+            </thread>
+            <tbody>
+
+            {% for promotion in promotions %}
+
+
+                <tr>
+                    <td>{{ promotion.id }}</td>
+                    <td>{{ promotion.modeleChaussure.nom }}</td>
+                    <td>{{ promotion.dateDebut|date('d-m-Y') }}</td>
+                    <td>{{ promotion.dateFin|date('d-m-Y') }}</td>
+                    <td>{{promotion.pourcentage ~ '%'}}</td>
+
+
+                    <td>
+
+                        <a href="{{ path('promotion_editFromHeader',{'id':promotion.id}) }}" class="btn btn-primary"><i
+                                    class="fas fa-edit"></i></a>
+                        <a href="{{ path('admin_chaussures_delete',{'id':promotion.id}) }}" class="btn btn-danger"><i
+                                    class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+
+
+
+
+
+
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

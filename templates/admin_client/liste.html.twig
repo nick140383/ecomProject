@@ -1,0 +1,53 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}liste des clients!{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+    <h1 class="my-5">Gestion des clients</h1>
+    <table class="table table-hover">
+    <thread>
+        <tr>
+            <th>Id</th>
+            <th>noms</th>
+            <th>prenoms</th>
+            <th>sexe</th>
+            <th>email</th>
+            <th>adresse</th>
+            <th>villes</th>
+            <th>Actions</th>
+
+
+
+            <th></th>
+        </tr>
+    </thread>
+    <tbody>
+
+    {% for client in clients %}
+
+
+        <tr>
+            <td>{{ client.id }}</td>
+            <td>{{ client.nom }}</td>
+            <td>{{ client.prenom  }}</td>
+            <td>{{ client.sexe }}</td>
+            <td>{{ client.email }}</td>
+            <td>{{ client.adresse }}</td>
+            <td>{{ client.ville.nom }}</td>
+
+
+
+
+
+            <td>
+
+                <a href="{{ path('ville_edit',{'id':client.id}) }}" class="btn btn-primary"><i
+                            class="fas fa-edit"></i></a>
+                <a href="{{ path('admin_chaussures_delete',{'id':client.id}) }}" class="btn btn-danger"><i
+                            class="fas fa-trash"></i></a>
+            </td>
+        </tr>
+    {% endfor %}
+
+{% endblock %}
